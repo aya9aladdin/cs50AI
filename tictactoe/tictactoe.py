@@ -64,8 +64,7 @@ def actions(board):
             
             if board[i][j]== None:
                 
-                action = (i,j)
-                moves.add(action)
+                moves.add((i,j))
     return moves
 
 
@@ -73,9 +72,8 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    p = player(board)
     new_board = copy.deepcopy(board)
-    new_board[action[0]][action[1]] = p
+    new_board[action[0]][action[1]] = player(board)
     return new_board
 
 
@@ -105,6 +103,9 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
+    if winner(board) is not None:
+        return True
+    
     for i in board:
         for j in i:
             if j == None:
@@ -143,39 +144,34 @@ def minimax(board):
     
     
 def max_player(board):
-   
- 
     if terminal(board):
         return utility(board), None
-    
-   
-        
+
     v = -math.inf
-    a = None
+    move = None
     for action in actions(board):
-        value, move = min_player(result(board, action))
-        v = max(v, value)
-        if v == 1:
-            a = action
-            return v, a
-        
-        return v, a
+        value, act = min_player(result(board, action))
+        if value > v:
+            v = value
+            move = action
+            if v == 1:
+                return v, move
+
+    return v, move
     
 def min_player(board):
-    
     if terminal(board):
         return utility(board), None
-    
 
-    
     v = math.inf
-    a = None
-
+    move  = None
     for action in actions(board):
-        value, move = max_player(result(board, action))
-        v = min(v, value)
-        if v == -1:
-            a = action
-            return v, a
-    
-    return v, a
+        value, act = max_player(result(board, action))
+        if value < v:
+            v = value
+            move = action
+
+            if v == -1:
+                return v, move
+
+    return v, move
